@@ -10,52 +10,50 @@ const pauseButton = document.querySelector(`[data-testid="control-button-playpau
 function GetSongName() {
     const name = songNameLabel?.textContent?.trim() || "Unknown Title";
     const artist = songAuthorLabel?.textContent?.trim() || "Unknown Artist";
-    const response = '${name}  ●  ${artist}'
+    const response = `${name}  ●  ${artist}`;
+    console.log(response);
     return response;
 }
 
 
-function OnSongChange() {
-    alert(GetSongName());
+function OnSongChange(newName) {
+    // alert(GetSongName());
+    console.log("!!!!!!!   New Song" + `${newName}`);
 }
 
 
+function delay(time) {
+  return new Promise(resolve => setTimeout(resolve, time));
+}
+
+
+
+8
 let lastSong = "";
-const callback = (mutationsList, observer) => {
-    alert("stat");
-    for (const mutation of mutationsList) {
-        if (mutation.type === 'childList' || mutation.type === "characterData")
-        {
-            const currentSong = GetSongName();
+let updateID = 0;
+function Update() {
+    console.log("Update #" + `${updateID}`);
 
-            if (currentSong === lastSong) {
-                continue;
-            }
-            lastSong = currentSong;
-
-            let response = OnSongChange();
-
-            // if (response === "skipSong") {
-            //     nextSongButton.click();
-            // }
-            //  else if (response === "start") {
-            //     pauseButton.click();
-            // }
-            break;
-        }
+    const currentSong = GetSongName();
+    if (currentSong !== lastSong) 
+    {
+        lastSong = currentSong;
+        let response = OnSongChange(currentSong);
     }
+
+
+    updateID++;
 };
-    
- // ///////////////////   do simple while loop 100 ms delay checking for update
-const observer = new MutationObserver(callback);
 
-// 4. Start observing the target element with specific configurations
-observer.observe(songNameLabel, {
-        childList: true,  
-        characterData: true,
-        subtree: true
-});
-alert("stat");
 
-// To stop watching the element later:
-// observer.disconnect();
+async function Start() 
+{
+    alert("start");
+    while (true) {
+        Update();
+        await delay(100);
+    }
+}
+
+
+Start();

@@ -11,7 +11,7 @@
         <Label Name="StatusLabel" Content="Recording..." HorizontalAlignment="Left" Margin="120,90,0,0" VerticalAlignment="Top" Width="160" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Arial"/>
 
         <Button Content="Toggle recording" HorizontalAlignment="Left" Margin="296,92,0,0" VerticalAlignment="Top" FontFamily="Arial"/>
-        <Button Content="Copy injection" Margin="152,155,0,0" VerticalAlignment="Top" FontFamily="Arial" Height="44" HorizontalAlignment="Left" Width="128" FontSize="16"/>
+        <Button Name="CopyInjectionButton" Click="CopyInjectionButton_Click" Content="Copy injection" Margin="129,155,0,0" VerticalAlignment="Top" FontFamily="Arial" Height="44" HorizontalAlignment="Left" Width="174" FontSize="16"/>
 
 
     </Grid>

@@ -16,7 +16,25 @@ function GetSongName() {
 
 
 function OnSongChange(newName) {
-    console.log(GetSongName());
+    console.log(`Song changed to ${newName}`);
+    const url = 'http://localhost:2034/song-update/';
+
+    fetch(url, {method: 'POST',
+        headers: {'Content-Type': 'text/plain'}, 
+        body: newName}
+    )
+    .then(response => response.text())
+    .then(status => {
+        if (status === "start") {
+            console.log("Server requested start");
+            pauseButton.click();
+        }
+        else if (status === "skip") {
+            console.log("Server requested skip");
+            nextSongButton.click();
+        }
+    })
+    .catch(error => console.error('Error connecting to c# server: ', error));
 }
 
 
@@ -30,14 +48,7 @@ const callback = (mutationsList, observer) => {
             if (currentSong !== lastSong) {
                 lastSong = currentSong;
 
-                let response = OnSongChange();
-
-                // if (response === "skipSong") {
-                //     nextSongButton.click();
-                // }
-                //  else if (response === "start") {
-                //     pauseButton.click();
-                // }
+                let response = OnSongChange(currentSong);
                 break;
             }
         }

@@ -1,0 +1,18 @@
+﻿<Window x:Class="RecordSpotify.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:RecordSpotify"
+        mc:Ignorable="d"
+        Title="Download Spotify" Height="300" Width="428">
+    <Grid Background="LightGray">
+        <Label Name="CurrentSongLabel" Content="Current song" HorizontalAlignment="Left" Margin="30,20,0,0" VerticalAlignment="Top" Height="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="340" FontSize="20" FontFamily="Arial"/>
+        <Label Name="StatusLabel" Content="Recording..." HorizontalAlignment="Left" Margin="120,90,0,0" VerticalAlignment="Top" Width="160" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Arial"/>
+
+        <Button Content="Toggle recording" HorizontalAlignment="Left" Margin="296,92,0,0" VerticalAlignment="Top" FontFamily="Arial"/>
+        <Button Content="Copy injection" Margin="152,155,0,0" VerticalAlignment="Top" FontFamily="Arial" Height="44" HorizontalAlignment="Left" Width="128" FontSize="16"/>
+
+
+    </Grid>
+</Window>

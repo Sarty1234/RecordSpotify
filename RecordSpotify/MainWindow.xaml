@@ -7,10 +7,10 @@
         mc:Ignorable="d"
         Title="Download Spotify" Height="300" Width="428">
     <Grid Background="LightGray">
-        <Label Name="CurrentSongLabel" Content="Current song" HorizontalAlignment="Left" Margin="30,20,0,0" VerticalAlignment="Top" Height="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="340" FontSize="20" FontFamily="Arial"/>
-        <Label Name="StatusLabel" Content="Recording..." HorizontalAlignment="Left" Margin="120,90,0,0" VerticalAlignment="Top" Width="160" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontFamily="Arial"/>
+        <Label Name="CurrentSongLabel" Content="Now playing {songname}" HorizontalAlignment="Center" Margin="0,20,0,0" VerticalAlignment="Top" Height="50" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Width="408" FontSize="20" FontFamily="Arial"/>
+        <Label Name="StatusLabel" Content="Status: Waiting next song to start" HorizontalAlignment="Left" Margin="89,90,0,0" VerticalAlignment="Top" Width="191" VerticalContentAlignment="Center" FontFamily="Arial"/>
 
-        <Button Content="Toggle recording" HorizontalAlignment="Left" Margin="296,92,0,0" VerticalAlignment="Top" FontFamily="Arial"/>
+        <Button Click="ToggleRecordingButton_Click" Content="Toggle recording" HorizontalAlignment="Left" Margin="296,92,0,0" VerticalAlignment="Top" FontFamily="Arial"/>
         <Button Name="CopyInjectionButton" Click="CopyInjectionButton_Click" Content="Copy injection" Margin="129,155,0,0" VerticalAlignment="Top" FontFamily="Arial" Height="44" HorizontalAlignment="Left" Width="174" FontSize="16"/>
 
 

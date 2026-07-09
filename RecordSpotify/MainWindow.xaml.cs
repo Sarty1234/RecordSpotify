@@ -82,7 +82,7 @@ namespace RecordSpotify
                         string responseMessage = "OK";
 
 
-                        // 2. Check for duplicates
+                        // Check for duplicates
                         string songPath = _outputFilePath + $"\\{incomingData}.mp3";
                         if (File.Exists(songPath))
                         {

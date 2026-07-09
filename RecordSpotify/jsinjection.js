@@ -25,6 +25,7 @@ function OnSongChange(newName) {
     )
     .then(response => response.text())
     .then(status => {
+        console.log("Server response: \n" + status);
         if (status === "start") {
             console.log("Server requested start");
             pauseButton.click();

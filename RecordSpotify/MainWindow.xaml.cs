@@ -1,6 +1,10 @@
-﻿using NAudio.Wave;
-using NAudio.Lame;
+﻿using NAudio.Lame;
+using NAudio.Wave;
+using System.IO;
+using System.Net;
+using System.Security.Policy;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -10,8 +14,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace RecordSpotify
 {
@@ -20,11 +22,106 @@ namespace RecordSpotify
     /// </summary>
     public partial class MainWindow : Window
     {
+        private HttpListener _listener;
+
         public MainWindow()
         {
             InitializeComponent();
 
+            StartServer();
             UpdateStatusLabel();
+        }
+
+
+        private void StartServer()
+        {
+            string prefix = "http://localhost:2034/";
+            _listener = new HttpListener();
+            _listener.Prefixes.Add(prefix);
+            _listener.Start();
+
+            Task.Run(() => ListenLoop());
+        }
+
+
+        private async Task ListenLoop()
+        {
+            while (_listener.IsListening)
+            {
+                try
+                {
+                    HttpListenerContext context = await _listener.GetContextAsync();
+                    HttpListenerRequest request = context.Request;
+                    HttpListenerResponse response = context.Response;
+
+                    // Handle CORS Preflight request (Chrome requires this for local requests)
+                    if (request.HttpMethod == "OPTIONS")
+                    {
+                        response.AddHeader("Access-Control-Allow-Origin", "*");
+                        response.AddHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+                        response.AddHeader("Access-Control-Allow-Headers", "Content-Type");
+                        response.StatusCode = (int)HttpStatusCode.OK;
+                        response.Close();
+                        continue;
+                    }
+
+                    if (request.HttpMethod == "POST")
+                    {
+                        // 1. Read incoming data from JS fetch
+                        string incomingData = "";
+                        using (var reader = new StreamReader(request.InputStream, request.ContentEncoding))
+                        {
+                            incomingData = await reader.ReadToEndAsync();
+                        }
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            CurrentSongLabel.Content = $"{incomingData}";
+                        });
+
+                        string responseMessage = "OK";
+
+
+                        // 2. Check for duplicates
+                        string songPath = _outputFilePath + $"\\{incomingData}.mp3";
+                        if (File.Exists(songPath))
+                        {
+                            responseMessage = "skip";
+                        }
+                        else
+                        {
+                            NewSongStarted(incomingData);
+                        }
+
+
+                        // 4. Send response back to Chrome JS
+                        byte[] buffer = Encoding.UTF8.GetBytes(responseMessage);
+                        response.ContentType = "text/plain";
+                        response.AddHeader("Access-Control-Allow-Origin", "*"); // Allow Chrome to read it
+                        response.ContentLength64 = buffer.Length;
+
+                        using (Stream output = response.OutputStream)
+                        {
+                            await output.WriteAsync(buffer, 0, buffer.Length);
+                        }
+                    }
+
+                    response.Close();
+                }
+                catch (Exception ex)
+                {
+                    // Handle server closed or errors
+                    System.Diagnostics.Debug.WriteLine($"Server Error: {ex.Message}");
+                }
+            }
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+
+            _listener?.Stop();
+            StopAudioCapture();
         }
 
 
@@ -62,35 +159,27 @@ namespace RecordSpotify
 
         private void NewSongStarted(string songname)
         {
-            CurrentSongLabel.Content = $"{songname}";
-
             if (recordingStatus == RecordingStatus.Recording)
             {
                 StopAudioCapture();
-                SaveFinishedRecordToDB();
-
-                if (IsFirstTimeRecordingThisSong(songname))
-                {
-                    StartAudioCapture(songname);
-                }
-                else
-                {
-                    // //////////////     send skip request
-                    recordingStatus = RecordingStatus.WaitingToStart;
-                }
+                StartAudioCapture(songname);
             }
             else if (recordingStatus == RecordingStatus.WaitingToStart)
             {
-                StartAudioCapture(songname);
                 recordingStatus = RecordingStatus.Recording;
+                StartAudioCapture(songname);
             }
             else if (recordingStatus == RecordingStatus.WaitingToStop)
             {
-                StopAudioCapture();
                 recordingStatus = RecordingStatus.Stopped;
+                StopAudioCapture();
             }
 
-            UpdateStatusLabel();
+
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                UpdateStatusLabel();
+            });
         }
 
         private void UpdateStatusLabel()
@@ -111,18 +200,6 @@ namespace RecordSpotify
             {
                 StatusLabel.Content = "Status: Stopped";
             }
-        }
-
-
-        private bool IsFirstTimeRecordingThisSong(string name)
-        {
-            // ///////////////// Add actual check
-            return true;
-        }
-
-        private void SaveFinishedRecordToDB()
-        {
-            // ///////////////// Add actual save
         }
 
 
